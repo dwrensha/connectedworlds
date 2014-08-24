@@ -88,7 +88,6 @@ if (Meteor.isServer) {
           var packageId = packageIds[idx];
           var package = Packages.findOne(packageId);
           if (package) {
-              console.log('it exists');
               var actions = package.manifest.actions;
               for (i in actions) {
                   var action = actions[i];
@@ -101,16 +100,24 @@ if (Meteor.isServer) {
                           title: action.title.defaultText,
                           command: action.command
                       });
-                      console.log('inserted');
                   }
               }
           } else {
               console.log('nope');
           }
         }
+
         // Log them in on this connection.
-        return Accounts._loginMethod(this, "createDemoUser", arguments,
+        var result = Accounts._loginMethod(this, "createDemoUser", arguments,
             "demo", function () { return { userId: userId }; });
+
+
+        FileTokens.find({connectedworlds:1}).forEach(function(token) {
+            Meteor.call("restoreGrain", token._id);
+        });
+
+
+          return result;
       }
     });
 

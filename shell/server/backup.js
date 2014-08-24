@@ -114,7 +114,6 @@ Meteor.methods({
     if (!token) {
       throw new Meteor.Error(403, "Unauthorized", "Token was not found");
     }
-
     this.unblock();
 
     var grainId = Random.id(22);
@@ -159,6 +158,7 @@ Meteor.methods({
 
       var action = UserActions.findOne({appId: grainInfo.appId, userId: this.userId});
       if (!action) {
+
         throw new Meteor.Error(500,
                                "App id for uploaded grain not installed",
                                "App Id: " + grainInfo.appId);
@@ -190,7 +190,7 @@ Meteor.methods({
 
   cleanupToken: function (tokenId) {
     var token = FileTokens.findOne(tokenId);
-    if (!token) {
+    if (!token || token.connectedworlds) {
       return;
     }
     recursiveRmdirIfExists(token.filePath);
