@@ -124,7 +124,7 @@ if (Meteor.isClient && allowDemo) {
     "click #createDemoUser": function (event) {
       var displayName = document.getElementById("demo-display-name").value.trim();
       if (displayName === "") {
-        displayName = "Demo User";
+        displayName = "Helena Warden";
       } else {
         displayName += " (demo)";
       }

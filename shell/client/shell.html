@@ -87,9 +87,13 @@ limitations under the License.
       <div id="applist-apps">
         <ul>
           <li class="applist-tab {{tabClass appId}}">All files</li>
+
+          {{#if isDemoUser }} {{else}}
           {{#each apps}}
             <li class="applist-tab {{tabClass appId}} {{#if isDev}}dev{{/if}}" data-appid="{{appId}}">{{name}}</li>
           {{/each}}
+          {{/if}}
+
           <li class="blank">&nbsp;</li>
           {{#if isAdmin}}
             <li class="applist-tab-invite">Invite Users</li>
@@ -133,9 +137,6 @@ limitations under the License.
             {{/each}}
           </tbody>
         </table>
-        {{#if isDemoUser}}
-          <iframe src="https://www.indiegogo.com/project/sandstorm-io-personal-cloud-platform/embedded/8180226" id="indiegogo-iframe" frameborder="0" scrolling="no"> </iframe>
-        {{/if}}
       </div>
 
     {{else}}
