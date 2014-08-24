@@ -1,0 +1,696 @@
+/* Sandstorm - Personal Cloud Sandbox
+ * Copyright (c) 2014 Sandstorm Development Group, Inc. and contributors
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Open Sans Light'), local('OpenSans-Light'), url(/opensans-light.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Open Sans Semibold'), local('OpenSans-Semibold'), url(/opensans-semibold.woff) format('woff');
+}
+
+html {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  font-family: "Open Sans", sans-serif;
+  font-weight: normal;
+  background-color: white;
+}
+
+#topbar, #topbar-right, #topbar-update {
+  background-color: black;
+  color: #ccc;
+  font-weight: bold;
+  line-height: 32px;
+}
+
+#topbar {
+  position: fixed;
+  width: 100%;
+  height: 32px;
+  text-align: left;
+}
+
+#topbar.light {
+  height: 24px;
+  line-height: 24px;
+  font-size: 90%;
+}
+
+#topbar-update {
+  position: fixed;
+  width: 100%;
+  height: 32px;
+  text-align: center;
+  border-bottom: 2px solid #fcc;
+  background-color: #622;
+  color: #fcc;
+  z-index: 2;
+  cursor: pointer;
+}
+
+#topbar-right {
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  height: 32px;
+  padding-right: 8px;
+  z-index: 1;
+}
+
+#topbar-right #crowdfunding {
+  display: inline-block;
+  background-color: #eb1478;
+  color: white;
+  text-decoration: none;
+  padding-left: 8px;
+  padding-right: 8px;
+  margin-right: 8px;
+}
+
+#topbar-right #crowdfunding:hover {
+  background-color: #F086B7;
+}
+
+#topbar a {
+  color: #ccc;
+  text-decoration: none;
+}
+#topbar a:hover {
+  color: white;
+}
+
+#topbar #homelink {
+  display: inline-block;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-right: 1px solid #666;
+}
+#topbar #homelink:hover {
+  background-color: #666;
+}
+
+#topbar #homelink img {
+  -webkit-filter: brightness(0.75);
+  filter: brightness(0.75);
+}
+#topbar #homelink:hover img {
+  -webkit-filter: none;
+}
+
+#topbar #icon {
+  vertical-align: baseline;
+}
+
+#topbar #grainTitle {
+  display: inline-block;
+  padding: 0 4px;
+}
+
+#topbar #grainTitle:hover {
+  cursor: pointer;
+  color: white;
+  background-color: #888;
+}
+
+#topbar #renameGrain, #topbar #deleteGrain, #topbar #openDebugLog, #topbar #backupGrain, #topbar #restartGrain {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  width: 24px;
+  height: 24px;
+  border: none;
+  color: transparent;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+#topbar #renameGrain {
+  background-image: url("/edit.png");
+}
+
+#topbar #deleteGrain {
+  background-image: url("/trash.png");
+}
+
+#topbar #openDebugLog {
+  background-image: url("/wrench.png");
+}
+
+#topbar #backupGrain {
+  background-image: url("/download.png");
+}
+
+#topbar #restartGrain {
+  background-image: url("/restart.png");
+}
+
+img.icon {
+  height: 16px;
+  padding: 0 8px;
+}
+
+img.photo {
+  height: 30px;
+  padding: 0 8px;
+}
+
+img {
+  vertical-align: middle;
+}
+
+.main-content {
+  margin: 0;
+  padding: 0;
+  position: fixed;
+  left: 0;
+  width: 100%;
+  top: 32px;
+  bottom: 0px;
+  color: black;
+  overflow: auto;
+}
+
+#app.main-content {
+  overflow: hidden;
+}
+
+#grainLog {
+  overflow: auto;
+}
+#grainLog>pre {
+  margin: 8px;
+}
+
+#grainLog .ansi-black-fg   { color:rgb(0, 0, 0);        }
+#grainLog .ansi-red-fg     { color:rgb(160, 0, 0);      }
+#grainLog .ansi-green-fg   { color:rgb(0, 160, 0);      }
+#grainLog .ansi-yellow-fg  { color:rgb(160, 160, 0);    }
+#grainLog .ansi-blue-fg    { color:rgb(0, 0, 160);      }
+#grainLog .ansi-magenta-fg { color:rgb(160, 0, 160);    }
+#grainLog .ansi-cyan-fg    { color:rgb(0, 160, 160);    }
+#grainLog .ansi-white-fg   { color:rgb(160,160,160);    }
+#grainLog .ansi-bright-black-fg   { color:rgb(0, 0, 0);     font-weight: bold; }
+#grainLog .ansi-bright-red-fg     { color:rgb(160, 0, 0);   font-weight: bold; }
+#grainLog .ansi-bright-green-fg   { color:rgb(0, 160, 0);   font-weight: bold; }
+#grainLog .ansi-bright-yellow-fg  { color:rgb(160, 160, 0); font-weight: bold; }
+#grainLog .ansi-bright-blue-fg    { color:rgb(0, 0, 160);   font-weight: bold; }
+#grainLog .ansi-bright-magenta-fg { color:rgb(160, 0, 160); font-weight: bold; }
+#grainLog .ansi-bright-cyan-fg    { color:rgb(0, 160, 160); font-weight: bold; }
+#grainLog .ansi-bright-white-fg   { color:rgb(160,160,160); font-weight: bold; }
+
+#grainLog .ansi-black-bg   { background-color:rgb(0, 0, 0);        }
+#grainLog .ansi-red-bg     { background-color:rgb(128, 0, 0);      }
+#grainLog .ansi-green-bg   { background-color:rgb(0, 128, 0);      }
+#grainLog .ansi-yellow-bg  { background-color:rgb(128, 128, 0);    }
+#grainLog .ansi-blue-bg    { background-color:rgb(0, 0, 128);      }
+#grainLog .ansi-magenta-bg { background-color:rgb(128, 0, 128);    }
+#grainLog .ansi-cyan-bg    { background-color:rgb(0, 128, 128);    }
+#grainLog .ansi-white-bg   { background-color:rgb(128,128,128);    }
+#grainLog .ansi-bright-black-bg   { background-color:rgb(85, 85, 85);     }
+#grainLog .ansi-bright-red-bg     { background-color:rgb(255, 85, 85);    }
+#grainLog .ansi-bright-green-bg   { background-color:rgb(0, 255, 0);      }
+#grainLog .ansi-bright-yellow-bg  { background-color:rgb(255, 255, 85);   }
+#grainLog .ansi-bright-blue-bg    { background-color:rgb(85, 85, 255);    }
+#grainLog .ansi-bright-magenta-bg { background-color:rgb(255, 85, 255);   }
+#grainLog .ansi-bright-cyan-bg    { background-color:rgb(85, 255, 255);   }
+#grainLog .ansi-bright-white-bg   { background-color:rgb(255, 255, 255);  }
+
+.centered-box {
+  margin: 16px auto;
+  width: 600px;
+  font-size: 125%;
+}
+
+.centered-box h2 {
+  margin-top: 0;
+  font-size: 60px;
+}
+
+.centered-box p:nth-child(1) {
+  margin-top: 0;
+}
+
+.centered-box p {
+  margin-bottom: 0;
+}
+
+#applist-apps {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 200px;
+  min-height: 100%;
+  background-color: #eee;
+  /* TODO(soon): Nice scrolling. Currently scroll bar ends up on the far right which is weird. */
+}
+
+#applist-apps ul {
+  padding: 0;
+  margin-left: 32px;
+}
+
+#applist-apps li {
+  list-style-type: none;
+  border-bottom: 1px solid #eee;
+  border-right: 2px solid #eee;
+  padding: 0 4px 0 16px;
+  background-color: #eee;
+  cursor: pointer;
+  line-height: 32px;
+}
+
+#applist-apps li:hover {
+  background-color: white;
+}
+
+#applist-apps li.blank {
+  cursor: inherit;
+}
+
+#applist-apps li.blank:hover {
+  background-color: #eee;
+}
+
+#applist-apps li.selected {
+  border-right: none;
+  background-color: white;
+}
+
+#applist-apps li.dev {
+  background-color: #ddd;
+}
+
+#applist-apps li.dev.selected, #applist-apps li.dev:hover {
+  background-color: white;
+}
+
+#applist-grains {
+  position: absolute;
+  left: 200px;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
+  padding: 16px 32px;
+}
+
+#applist-grains.dev {
+  background-image: url(/devmode.png);
+}
+
+#applist-grains #devmode-note {
+  position: fixed;
+  color: black;
+  margin-top: 600px;
+  font-size: 200px;
+  font-weight: 600;
+  z-index: -1;
+  -webkit-transform: rotate(-45deg);
+}
+
+#applist-grains table {
+  padding: 0;
+  margin: 8px 0 0 0;
+  border-collapse: collapse;
+  width: 600px;
+}
+
+#applist-grains table thead td {
+  font-weight: 600;
+  border-bottom: 1px solid #aaa;
+}
+
+#applist-grains table td:first-child {
+  width: 400px;
+  padding-left: 16px;
+}
+
+#applist-grains table tr {
+  height: 32px;
+  border-bottom: 1px solid #ddd;
+}
+
+#applist-grains table tbody tr:hover {
+  background-color: #f8f8f8;
+  cursor: pointer;
+}
+
+#applist-grains .button-box button {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 600;
+  background-color: #428bca;
+
+  padding: 8px;
+  line-height: 1.33;
+  border-radius: 4px;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+
+#intro h1 {
+  text-align: center;
+  font-size: 100px;
+  font-weight: bold;
+  margin: 0 auto;
+}
+
+svg {
+  width: 400px;
+  height: 300px;
+}
+
+#logo {
+  width: 400px;
+  height: 300px;
+  margin: 64px auto 16px;
+  z-index: -1;
+  padding-left: 94px;
+}
+
+.static-logo {
+  background-image:url(/logo.png);
+  background-repeat:no-repeat;
+}
+
+.dynamic-logo {
+  cursor: pointer;
+}
+
+#intro p {
+  text-align: center;
+}
+
+#intro .build-tag {
+  margin-top: 0;
+}
+
+#app iframe {
+  border: none;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+div.popup {
+  position: fixed;
+  top: 32px;
+  max-height: calc(100vh - 64px);
+
+  border: 2px solid #ccc;
+  border-top: none;
+  border-left: none;
+  z-index: 101;
+  background-color: black;
+  /*background-color: rgba(0, 0, 0, 0.9);*/
+  padding: 0;
+  font-size: 85%;
+  line-height: normal;
+  min-width: 250px;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+div.popup-closer {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+}
+
+div.popup h1 {
+  font-size: 125%;
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+  padding: 4px;
+  margin: 0;
+}
+
+div.popup hr {
+  border: none;
+  border-bottom: 2px solid #ccc;
+  margin: 4px;
+}
+
+div.popup h2 {
+  font-size: 110%;
+  font-weight: bold;
+  margin: 4px;
+}
+
+#install {}
+
+#install button {
+  font-family: inherit;
+  background-color: #428bca;
+  font-size: 150%;
+  font-weight: 600;
+
+  padding: 10px 16px;
+  line-height: 1.33;
+  border-radius: 6px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  text-align: center;
+}
+
+#install ol {
+  margin: 16px auto;
+  width: 600px;
+
+  text-align: center;
+  list-style-type: none;
+  font-size: 200%;
+}
+#install ol p {
+  font-size: 50%;  /* revert above */
+  font-weight: normal;
+}
+
+#install pre {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+#install li {
+  display: none;
+}
+
+#install li .progress {
+  display: none;
+}
+
+#install #step-confirm .confirm-form { display: none; }
+#install #step-run     .done-notice  { display: none; }
+
+#install.instep-download #step-download { display: block; font-weight: bold; }
+#install.instep-verify   #step-verify   { display: block; font-weight: bold; }
+#install.instep-unpack   #step-unpack   { display: block; font-weight: bold; }
+#install.instep-analyze  #step-analyze  { display: block; font-weight: bold; }
+#install.instep-confirm  #step-confirm  { display: block; font-weight: bold; }
+#install.instep-run      #step-run      { display: block; font-weight: bold; }
+
+#install.instep-download #step-download .progress { display: inline; }
+#install.instep-verify   #step-verify   .progress { display: inline; }
+#install.instep-unpack   #step-unpack   .progress { display: inline; }
+#install.instep-analyze  #step-analyze  .progress { display: inline; }
+#install.instep-confirm  #step-confirm  .confirm-form { display: block; }
+#install.instep-run      #step-run      .done-notice { display: block; }
+
+#my-files-arrow, #sign-in-arrow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 300px;
+  height: 400px;
+  z-index: -1;
+
+  background-image: url(/files-arrow.svg);
+}
+
+#sign-in-arrow {
+  left: auto;
+  right: 0;
+
+  -moz-transform: scaleX(-1);
+  -o-transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
+  -ms-transform: scaleX(-1);
+  transform: scaleX(-1);
+}
+
+#key-note {
+  width: 300px;
+}
+
+input.autoSelect {
+  font-family: monospace;
+  width: 450px;
+}
+
+#invite input, #invite select {
+  font: inherit;
+  font-size: inherit;
+  width: 80%;
+  box-sizing: border-box;
+}
+
+#invite textarea {
+  vertical-align: text-top;
+  width: 80%;
+  height: 200px;
+  font: inherit;
+  font-size: inherit;
+  box-sizing: border-box;
+}
+
+#invite button {
+  font-family: inherit;
+  font-size: 90%;
+  background-color: #428bca;
+
+  padding: 6px;
+  line-height: 1.33;
+  border-radius: 4px;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+#invite button:disabled {
+  background-color: #888;
+}
+
+#stats td {
+  text-align: center;
+  vertical-align: middle;
+  padding: 8px;
+  border: 1px solid #aaa;
+}
+#stats table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#about h2 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+#about p {
+  margin-top: 0;
+  margin-bottom: 1em;
+}
+
+#intro .action-required {
+  background-color: #eee;
+  border-radius: 8px;
+  width: 600px;
+  margin: 16px auto;
+  padding: 12px;
+  position: fixed;
+  right: 16px;
+  z-index: 16;
+}
+
+#intro .action-required h1 {
+  color: red;
+  text-align: center;
+  font-size: 75px;
+  font-weight: bold;
+  margin: 0 auto;
+}
+
+#intro .action-required p {
+  text-align: left;
+  max-width: 600px;
+  margin: 1em auto;
+}
+
+#intro .action-required button {
+  font-family: inherit;
+  background-color: #428bca;
+
+  font-size: 150%;
+  padding: 8px;
+  border-radius: 4px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  text-align: center;
+}
+
+#demo h2 {
+  text-align: center;
+}
+
+#demo input {
+  width: 100%;
+  font-size: 60px;
+  text-align: center;
+}
+#demo button {
+  font-family: inherit;
+  background-color: #428bca;
+
+  padding: 10px 16px;
+  font-size: 60px;
+  line-height: 1.33;
+  border-radius: 6px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+}
+
+#indiegogo-iframe {
+  width: 222px;
+  height: 445px;
+  position: fixed;
+  top: 48px;
+  right: 16px;
+}
+
+@media screen and (max-width: 1120px) {
+  #indiegogo-iframe {
+    position: static;
+    margin-top: 32px;
+    float: right;
+  }
+}

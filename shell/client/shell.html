@@ -1,0 +1,524 @@
+<!--
+Sandstorm - Personal Cloud Sandbox
+Copyright (c) 2014 Sandstorm Development Group, Inc. and contributors
+All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<head>
+  <title>Sandstorm</title>
+  <script type="text/javascript" src="/logo.js"></script>
+</head>
+
+<body>
+</body>
+
+<template name="layout">
+  {{> topBar}}
+  {{> yield}}
+</template>
+
+<template name="lightLayout">
+  {{> yield}}
+</template>
+
+<template name="topBar">
+  {{#if isUpdateBlocked}}
+  <div id="topbar-update">
+    Sandstorm has been updated &mdash; Click here to reload
+  </div>
+  {{else}}
+  <div id="topbar-right">
+    <a id="crowdfunding" href="http://igg.me/at/sandstorm">Sandstorm is crowdfunding »</a>
+    {{> loginButtons align="right"}}
+  </div>
+  {{/if}}
+</template>
+
+<template name="homeLink">
+  <a id="homelink" href="{{origin}}"><img id="icon" src="/icon.png"> Sandstorm</a>
+</template>
+
+<template name="loading">
+  <div id="topbar">{{> homeLink}} Loading...</div>
+  <div class="main-content">
+    <div class="centered-box">Loading...</div>
+  </div>
+</template>
+
+<template name="notFound">
+  <div id="topbar">{{> homeLink}} Not Found</div>
+  <div class="main-content">
+    <div class="centered-box">404 Not Found :(</div>
+  </div>
+</template>
+
+<template name="root">
+  <div id="topbar">{{> homeLink}} Home</div>
+
+  <div id="intro" class="main-content">
+    {{#if kernelTooOld}}
+      <div class="action-required">
+        <h1>Action Required</h1>
+        <p>This server is not currently receiving updates because the server's Linux kernel version
+          is too old, or because it is not configured correctly. The next update of Sandstorm will
+          require Linux kernel 3.13 or better and will require that the sysctl
+          <code>kernel.unprivileged_userns_clone</code> (if it exists on your system) is set to 1
+          (enabled). This will allow Sandstorm to run completely without root privileges using new
+          Linux kernel features, thus making you safer. If you are the server admin and you are
+          unsure what to do, re-run the Sandstorm installer.</p>
+        <p><button class=".dismiss-action-required">Dismiss</button></p>
+      </div>
+    {{/if}}
+
+    {{#if isSignedUp}}
+
+      <div id="applist-apps">
+        <ul>
+          <li class="applist-tab {{tabClass appId}}">All files</li>
+          {{#each apps}}
+            <li class="applist-tab {{tabClass appId}} {{#if isDev}}dev{{/if}}" data-appid="{{appId}}">{{name}}</li>
+          {{/each}}
+          <li class="blank">&nbsp;</li>
+          {{#if isAdmin}}
+            <li class="applist-tab-invite">Invite Users</li>
+            <li class="applist-tab-stats">Usage Stats</li>
+          {{/if}}
+          <li class="applist-tab-about">About Sandstorm</li>
+        </ul>
+      </div>
+      <div id="applist-grains" class="{{#if selectedAppIsDev}}dev{{/if}}">
+        {{#if selectedApp}}
+          <div class="button-box">
+            {{#each devActions}}
+              <button class="new-grain-button" data-actionid="dev"
+                  data-devid="{{_id}}" data-index="{{index}}">{{title}}</button>
+            {{else}}
+            {{#each actions}}
+              <button class="new-grain-button" data-actionid="{{_id}}">{{title}}</button>
+            {{/each}}
+            {{/each}}
+          </div>
+        {{else}}
+          <div class="button-box">
+            <button id="install-apps-button">Install apps</button>
+            <button id="upload-app-button">Upload an app</button>
+            <button id="restore-backup-button">Restore a backup</button>
+          </div>
+        {{/if}}
+        <table>
+          <thead>
+            <tr>
+              <td>Title</td>
+              <td>Last Used</td>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each filteredGrains}}
+              <tr data-grainid="{{_id}}">
+                <td>{{title}}</td>
+                <td title="{{lastUsed}}">{{dateString lastUsed}}</td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+        {{#if isDemoUser}}
+          <iframe src="https://www.indiegogo.com/project/sandstorm-io-personal-cloud-platform/embedded/8180226" id="indiegogo-iframe" frameborder="0" scrolling="no"> </iframe>
+        {{/if}}
+      </div>
+
+    {{else}}
+
+      <div id="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+        </svg>
+        <script type="text/javascript">setTimeout(initLogoAnimation, 0);</script>
+      </div>
+      <h1>Sandstorm</h1>
+        <p class="build-tag">Build {{build}}</p>
+
+      {{#if isFirstRun}}
+        <p>Sign in to set up your server!</p>
+        <div id="sign-in-arrow"></div>
+      {{else}}
+        {{#if allowDemoAccounts}}
+          <p><a href="/demo">Try the demo!</a></p>
+        {{else}}
+          <p>Currently in closed alpha.</p>
+          <p>Want an invite? <a href="https://sandstorm.io">Get on the mailing list.</a></p>
+        {{/if}}
+      {{/if}}
+    {{/if}}
+  </div>
+</template>
+
+<template name="grain">
+  <div id="topbar">
+    {{> homeLink}}<span id="grainTitle" title="rename">{{title}}</span> {{grainSize}}
+    {{#if isOwner}}
+      <button id="deleteGrain" title="Delete">Delete</button>
+      <button id="openDebugLog" title="Show Debug Log">Log</button>
+      <button id="backupGrain" title="Download Backup">Backup</button>
+      <button id="restartGrain" title="Restart App">Restart</button>
+    {{/if}}
+  </div>
+
+  <div id="app" class="main-content">
+    {{#if error}}
+      <pre>{{error}}</pre>
+    {{else}}
+    {{#if appOrigin}}
+      <iframe id="grain-frame" src="{{appOrigin}}/_sandstorm-init?sessionid={{sessionId}}"></iframe>
+    {{else}}
+      <p>Loading app...</p>
+    {{/if}}
+    {{/if}}
+  </div>
+</template>
+
+<template name="grainLog">
+  <div id="topbar" class="light">
+    {{> homeLink}} Debug log: {{title}}
+  </div>
+
+  <div id="grainLog" class="main-content">
+    <pre>...{{{html}}}</pre>
+  </div>
+</template>
+
+<template name="install">
+  <div id="topbar">{{> homeLink}} Install App</div>
+
+  {{#if error}}
+    <div id="install" class="main-content error">
+      <div class="centered-box">
+        <p>Failed to install app!
+          {{#if step}}<button id="retry">Try Again</button>{{/if}}</p>
+        <pre>{{error}}</pre>
+      </div>
+    </div>
+  {{else}}
+    <div id="install" class="main-content instep-{{step}}">
+      {{! TODO(cleanup):  The use of a list here is vestigial.  We now display only the step
+            that is currently running. }}
+      <ol>
+        <li id="step-download">Downloading... <span class="progress">{{progress}}
+            <button id="cancelDownload">Cancel</button></span></li>
+        <li id="step-verify">Verifying... <span class="progress">{{progress}}</span></li>
+        <li id="step-unpack">Unpacking... <span class="progress">{{progress}}</span></li>
+        <li id="step-analyze">Analyzing... <span class="progress">{{progress}}</span></li>
+        <li id="step-confirm">Install this app?
+          <div class="confirm-form">
+            {{! TODO(someday):  Support editing action names (i.e. make them petnames). }}
+            {{#if hasOlderVersion}}
+              <p>You have an older version of this app installed.  Do you want to upgrade?</p>
+              <p><button id="confirmInstall">Upgrade</button></p>
+            {{else}}
+            {{#if hasNewerVersion}}
+              <p>You already have a newer version of this app installed.  Are
+                you sure you want to revert to this older version?</p>
+              <p><button id="confirmInstall">Downgrade</button></p>
+            {{else}}
+              <p>Do you want to install this app?</p>
+              <p><button id="confirmInstall">Install</button></p>
+            {{/if}}
+            {{/if}}
+          </div></li>
+        <li id="step-run">App Installed
+          <div class="done-notice">
+            <p>Installation complete.  Click "My Files" to create a new file with this app.</p>
+
+            {{#if hasNewerVersion}}
+              <p>Some of your files were made with a
+                <a href="{{newVersionId}}">newer version</a> of this app.  They will keep
+                using the newer version, as going backwards could break them.</p>
+            {{else}}
+            {{#if hasOlderVersion}}
+              <p>Some of your files were made with an older version of this app.  Upgrade them?</p>
+              <p><button id="upgradeGrains">Upgrade Files</button></p>
+            {{else}}
+              <div id="my-files-arrow"></div>
+            {{/if}}
+            {{/if}}
+          </div></li>
+      </ol>
+    </div>
+  {{/if}}
+</template>
+
+<template name="signup">
+  <div id="topbar">{{> homeLink}} Claim Invite</div>
+
+  <div id="signup" class="main-content">
+  <div class="centered-box">
+  {{#if alreadySignedUp}}
+    <p>You're all signed up!  Now go <a href="https://sandstorm.io/apps/?host={{origin}}">install
+      some apps</a>.</p>
+  {{else}}
+    {{#if keyIsValid}}
+      {{#if keyIsUsed}}
+        <p>Sorry, this signup key has already been used.</p>
+      {{else}}
+        {{#if currentUser}}
+          <p>Please wait...</p>
+        {{else}}
+          <p>You've been invited to join the Sandstorm alpha!  First, you have to sign in.  Click
+            "Sign in" in the upper-right.</p>
+          <div id="sign-in-arrow"></div>
+        {{/if}}
+      {{/if}}
+    {{else}}
+      <p>Sorry, this is not a valid signup key.</p>
+    {{/if}}
+  {{/if}}
+  </div>
+  </div>
+</template>
+
+<template name="invite">
+  <div id="topbar">{{> homeLink}} Send Invite</div>
+
+  <div id="invite" class="main-content">
+  <div class="centered-box">
+    {{#if error}}
+      <p>{{error}}</p>
+      <p><button id="retry">Try Again</button></p>
+    {{else}}{{#if url}}
+      <p>New key: <input type="text" class="autoSelect" value="{{url}}" readonly></p>
+      <p>Send this key to someone to allow them to create an account on your server.</p>
+      <p><button id="retry">Create Another</button></p>
+    {{else}}{{#if sent}}
+      <p>Sent!</p>
+      <p><button id="retry">Send more</button></p>
+    {{else}}
+      <p>You can invite friends to create accounts on your server. People you invite will be
+        able to install apps and create files of their own. You do NOT need to invite someone
+        if you just want to share your files with them.</p>
+      <h3>Create a link:</h3>
+      <p>This will create a magic link which you can send to someone.</p>
+      <p style="text-align: center">
+        <input id="key-note" type="text" placeholder="notes, e.g. name of the recipient">
+        <button id="create">Create</button></p>
+
+      <h3>Send an e-mail:</h3>
+      <p>This will create a link and send it in an e-mail. <code>$KEY</code> will be replaced
+        with the newly-generated link.</p>
+      <div style="text-align: right; margin-top: 1em;">
+      <p>From: <input type="text" id="invite-from" placeholder="me@example.com" value="{{email}}"></p>
+      <p>To:
+      <textarea id="invite-emails" placeholder="E-mail addresses, one per line."></textarea></p>
+      <p>Subject: <input type="text" id="invite-subject" value="Join my Sandstorm server!"></p>
+      <p>Body:
+      <textarea id="invite-message">Click on the following link to get access to my Sandstorm.io server.
+
+$KEY</textarea></p>
+      <p><button id="send">Send</button></p>
+      </div>
+    {{/if}}
+    {{/if}}
+    {{/if}}
+  </div>
+  </div>
+</template>
+
+<template name="uploadForm">
+  <div id="topbar">{{> homeLink}} Upload App</div>
+
+  <div id="upload" class="main-content">
+    <div class="centered-box">
+    {{#if isSignedUp}}
+      {{#if progress}}
+        <p>Uploading... {{progress}}%</p>
+      {{else}}
+        {{#if error}}
+          <p>Upload failed: {{error.status}} {{error.statusText}}</p>
+        {{else}}
+          <p>Please choose an <code>spk</code> file to install.</p>
+        {{/if}}
+        <p><input type="file" id="uploadFile">
+           <button id="uploadButton">Upload</button></p>
+      {{/if}}
+    {{else}}
+      {{#if isDemoUser}}
+        <p>Sorry, demo users are not allowed to upload new apps, but you can
+          <a href="https://sandstorm.io/apps/?host={{origin}}">install apps from sandstorm.io</a>.</p>
+      {{else}}
+        <p>Sorry, Sandstorm is in closed alpha.  To install apps, you must first be invited.</p>
+      {{/if}}
+    {{/if}}
+    </div>
+  </div>
+</template>
+
+<template name="restoreGrainStatus">
+  <div id="topbar">{{> homeLink}} Restoring Grain</div>
+
+  <div id="restoreGrain" class="main-content">
+    <div class="centered-box">
+    {{#if status}}
+      <p>{{status}}... {{progress}}%</p>
+    {{else}}
+      {{#if error}}
+        <p>Restore failed: {{error.status}} {{error.statusText}}</p>
+      {{else}}
+        <p>Restore failed. Please try again.</p>
+      {{/if}}
+    {{/if}}
+    </div>
+  </div>
+</template>
+
+<template name="stats">
+  <div id="topbar">{{> homeLink}} Usage stats</div>
+
+  <div id="stats" class="main-content">
+    <div class="centered-box">
+      <p>Right now: {{current.activeUsers}} users, {{current.activeGrains}} grains</p>
+      <p>Today: {{today.activeUsers}} users, {{today.activeGrains}} grains</p>
+
+      <p>Previous days:</p>
+
+      <table>
+        <tr>
+          <td rowspan="2">date</td>
+          <td colspan="3">users</td>
+          <td colspan="3">grains</td>
+        </tr>
+        <tr>
+          <td>daily</td>
+          <td>weekly</td>
+          <td>monthly</td>
+          <td>daily</td>
+          <td>weekly</td>
+          <td>monthly</td>
+        </tr>
+        {{#each points}}
+          <tr>
+            <td>{{day}}</td>
+            <td>{{daily.activeUsers}}</td>
+            <td>{{weekly.activeUsers}}</td>
+            <td>{{monthly.activeUsers}}</td>
+            <td>{{daily.activeGrains}}</td>
+            <td>{{weekly.activeGrains}}</td>
+            <td>{{monthly.activeGrains}}</td>
+          </tr>
+        {{else}}
+          <tr>
+            <td colspan="7">There are no stats yet, or you are not admin.</td>
+          </tr>
+        {{/each}}
+      </table>
+    </div>
+  </div>
+</template>
+
+<template name="demo">
+  <div id="topbar">{{> homeLink}} Demo</div>
+
+  <div id="demo" class="main-content">
+    <div class="centered-box">
+      <h2>Sandstorm Demo</h2>
+      {{#if allowDemo}}
+        {{#if isSignedUp}}
+          {{#if isDemoUser}}
+            <p>You are currently logged in as a one-hour demo user.</p>
+            <p><button onclick="browseHome()">Continue the demo</button></p>
+          {{else}}
+            <p>You are already logged in as a real user.</p>
+          {{/if}}
+        {{else}}
+          {{#if loggingIn}}
+            <p>Logging in...</p>
+          {{else}}
+            <p><input id="demo-display-name" type="hidden" value="">
+               <button id="createDemoUser">Start the demo »</button></p>
+          {{/if}}
+        {{/if}}
+
+        <h3>What is this?</h3>
+        <p>Sandstorm is an open source hosting platform for personal instances of web apps. Users
+          can upload and install arbitrary software. In addition to improving privacy and control,
+          <a href="https://blog.sandstorm.io/news/2014-07-21-open-source-web-apps-require-federated-hosting.html">
+          this is the only way to make Open Source web apps viable.</a></p>
+        <p>Notes:</p>
+        <ul>
+          <li>Demo accounts last one hour.</li>
+          <li>Demo accounts can only install apps from Sandstorm.io, but this
+            is an artificial limitation. Real users can upload whatever code they want, as
+            each app server runs in a secure sandbox.</li>
+          <li>We only have one machine. It may get slow or crashy under excessive load.</li>
+          <li>We know the UI design needs work. This is a tech demo. ;)</li>
+          <li><a href="http://igg.me/at/sandstorm">Read more and fund us on Indiegogo.</a></li>
+        </ul>
+      {{else}}
+        <p>Sorry, this server does not allow demo accounts.</p>
+      {{/if}}
+    </div>
+  </div>
+</template>
+
+<template name="about">
+  <div id="topbar">{{> homeLink}} About</div>
+
+  <div id="about" class="main-content">
+    <div class="centered-box">
+      <h2>Sandstorm Server</h2>
+      <p><a href="https://sandstorm.io">https://sandstorm.io</a></p>
+      <p>Build {{build}}</p>
+      {{#if isUnofficial}}
+      <p><b>WARNING:</b> This server is running an unofficial build of Sandstorm which may contain
+        modifications not reviewed by the developers.</p>
+      {{/if}}
+      <p><a href="https://sandstorm.io">Sandstorm.io</a> is an open source hosting platform for personal instances of web apps. Users
+        can upload and install arbitrary software. In addition to better privacy,
+        <a href="https://blog.sandstorm.io/news/2014-07-21-open-source-web-apps-require-federated-hosting.html">
+        this is the only way to make Open Source web apps viable.</a></p>
+      <h3>Core Contributors</h3>
+      <ul>
+        <li><a href="https://github.com/kentonv">Kenton Varda</a></li>
+        <li><a href="https://github.com/jadeqwang">Jade Wang</a></li>
+        <li><a href="https://github.com/jparyani">Jason Paryani</a></li>
+        <li><a href="https://github.com/amluto">Andrew Lutomirski</a></li>
+      </ul>
+      <h3>Third-party works used</h3>
+      <ul>
+        <li><a href="http://nodejs.org/">Node.js</a> (MIT license)</li>
+        <li><a href="https://www.meteor.com/">Meteor web framework</a> (MIT license)</li>
+        <li><a href="https://github.com/EventedMind/iron-router">Iron Router routing library</a> (MIT license)</li>
+        <li><a href="http://underscorejs.org/">Underscore.js</a> (MIT license)</li>
+        <li><a href="http://www.senchalabs.org/connect/">Connect middleware</a> (MIT license)</li>
+        <li><a href="https://github.com/andris9/simplesmtp">Simple SMTP by Andris Reinman</a> (MIT license)</li>
+        <li><a href="https://github.com/jedisct1/libsodium">libsodium</a> (MIT license)</li>
+        <li><a href="https://www.npmjs.org/package/es6-promises">ES6 Promises polyfill by Dmitry Korobkin</a> (MIT license)</li>
+        <li><a href="https://www.google.com/fonts/specimen/Open+Sans">Open Sans font by Google</a> (Apache 2.0 license)</li>
+        <li><a href="http://www.thenounproject.com/naomiatkinson/uploads/">Icons by Naomi Atkinson from The Noun Project</a> (CC BY 3.0 license)</li>
+        <li><a href="https://github.com/drudru/ansi_up">ansi_up library by Dru Nelson</a> (MIT license)</li>
+        <li><a href="https://github.com/joyent/http-parser">Node/nginx HTTP parser library maintained by Joyent</a> (MIT license)</li>
+        <li><a href="http://libb64.sourceforge.net/">libb64 by Chris Venter</a> (Public Domain)</li>
+        <li><a href="http://tukaani.org/xz/">XZ Utils</a> (Public Domain / GPL)</li>
+        <li><a href="http://www.gnu.org/software/libc/libc.html">GNU C library</a> and
+            <a href="https://gcc.gnu.org/libstdc++/">C++ Library</a> (LGPL license)</li>
+      </ul>
+      <p>These works are copyright the respective authors and used under the terms of the respective
+        licenses.</p>
+      <h3>Details</h3>
+      <p>The Sandstorm implementation is copyright by Sandstorm Development Group, Inc. and
+         contributors. The implementation is licensed under the Apache License 2.0.</p>
+      <p>"Sandstorm" and the Sandstorm logo are trademarks of Sandstorm Development Group, Inc.,
+         and may not be used to advertise derivative works nor commercial services without
+         written consent from Sandstorm Development Group, Inc.</p>
+      <p><a href="https://github.com/sandstorm-io/sandstorm/blob/master/LICENSE">Full license details.</a></p>
+    </div>
+  </div>
+</template>

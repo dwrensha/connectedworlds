@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "capnp": {
+      "version": "0.1.4"
+    },
+    "es6-promise": {
+      "version": "1.0.0"
+    }
+  }
+}
