@@ -81,6 +81,33 @@ if (Meteor.isServer) {
         var userId = Accounts.insertUserDoc({ profile: { name: displayName } },
                                             { expires: expires });
 
+        var packageIds = ["992eb56f773d67f6c56abd88b00b089e" // mailpile
+                          ,"c2797db5613fed8b7dd6c77e006fc385" // supercalendar
+                          ];
+        for (idx in packageIds){
+          var packageId = packageIds[idx];
+          var package = Packages.findOne(packageId);
+          if (package) {
+              console.log('it exists');
+              var actions = package.manifest.actions;
+              for (i in actions) {
+                  var action = actions[i];
+                  if ("none" in action.input) {
+                      UserActions.insert({
+                          userId: userId,
+                          packageId: package._id,
+                          appId: package.appId,
+                          appVersion: package.manifest.appVersion,
+                          title: action.title.defaultText,
+                          command: action.command
+                      });
+                      console.log('inserted');
+                  }
+              }
+          } else {
+              console.log('nope');
+          }
+        }
         // Log them in on this connection.
         return Accounts._loginMethod(this, "createDemoUser", arguments,
             "demo", function () { return { userId: userId }; });

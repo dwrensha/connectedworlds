@@ -88,11 +88,11 @@ limitations under the License.
         <ul>
           <li class="applist-tab {{tabClass appId}}">All files</li>
 
-          {{#if isDemoUser }} {{else}}
+          <!-- {{#if isDemoUser }} {{else}} -->
           {{#each apps}}
             <li class="applist-tab {{tabClass appId}} {{#if isDev}}dev{{/if}}" data-appid="{{appId}}">{{name}}</li>
           {{/each}}
-          {{/if}}
+          <!-- {{/if}} -->
 
           <li class="blank">&nbsp;</li>
           {{#if isAdmin}}
