@@ -17,7 +17,7 @@
 var allowDemo = Meteor.settings && Meteor.settings.public &&
                 Meteor.settings.public.allowDemoAccounts;
 
-var DEMO_EXPIRATION_MS = 60 * 60 * 1000;
+var DEMO_EXPIRATION_MS = 6 * 60 * 60 * 1000; // six hours
 
 if (Meteor.isServer) {
   Accounts.validateLoginAttempt(function (attempt) {
@@ -83,6 +83,7 @@ if (Meteor.isServer) {
 
         var packageIds = ["992eb56f773d67f6c56abd88b00b089e" // mailpile
                           ,"c2797db5613fed8b7dd6c77e006fc385" // supercalendar
+                          ,"0af93fa1c819043c41cd0ba020fb2ef0" // sharelatex
                           ];
         for (idx in packageIds){
           var packageId = packageIds[idx];

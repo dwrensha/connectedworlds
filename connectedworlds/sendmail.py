@@ -12,7 +12,7 @@ from email.mime.text import MIMEText
 #    print "usage: ./sendmail.py filename from to"
 #    exit(1)
 
-#fp = open(sys.argv[1], 'rb')
+
 
 # Create a text/plain message
 msg = MIMEText(
@@ -22,18 +22,30 @@ haha I might be in Hawaii too! John and I were thinking of starting with San Die
 )
 
 recipient = "hgrx3qavoeh8s6vzeaq5@connectedworlds.dwrensha.ws";
-sender = "carmen@example.com"
+carmen = "carmen@example.com"
 
 
 # me == the sender's email address
 # you == the recipient's email address
 msg['Subject'] = 'Re: travel'
-msg['From'] = '"Carmen San Diego" <' + sender + '>'
+msg['From'] = '"Carmen San Diego" <' + carmen + '>'
 msg['To'] = recipient
 
+########################
 
-# Send the message via our own SMTP server, but don't include the
-# envelope header.
+fp = open('vimeo.txt', 'rb')
+vimeomsg = MIMEText(fp.read(), 'html')
+vimeo = "vimeo@email.vimeo.com"
+vimeomsg['Subject'] = 'Helena, meet Vimeo !!'
+vimeomsg['Date'] = 'Sun, Aug 24, 2014 at 12:10 PM'
+vimeomsg['From'] = vimeo
+vimeomsg['To'] = recipient
+
+
+
 s = smtplib.SMTP('localhost', 30025)
-s.sendmail(sender, [recipient], msg.as_string())
+#s.sendmail(carmen, [recipient], msg.as_string())
+s.sendmail(vimeo, [recipient], vimeomsg.as_string())
 s.quit()
+
+
