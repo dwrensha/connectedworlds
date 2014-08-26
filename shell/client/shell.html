@@ -47,7 +47,7 @@ limitations under the License.
 </template>
 
 <template name="homeLink">
-  <a id="homelink" href="{{origin}}"><img id="icon" src="/icon.png"> Sandstorm</a>
+  <a id="homelink" href="{{origin}}"><img id="icon" src="/icon.png"> Home</a>
 </template>
 
 <template name="loading">
@@ -88,11 +88,11 @@ limitations under the License.
         <ul>
           <li class="applist-tab {{tabClass appId}}">All files</li>
 
-          <!-- {{#if isDemoUser }} {{else}} -->
+          {{#if isDemoUser }} {{else}}
           {{#each apps}}
             <li class="applist-tab {{tabClass appId}} {{#if isDev}}dev{{/if}}" data-appid="{{appId}}">{{name}}</li>
           {{/each}}
-          <!-- {{/if}} -->
+          {{/if}}
 
           <li class="blank">&nbsp;</li>
           {{#if isAdmin}}
@@ -116,9 +116,11 @@ limitations under the License.
           </div>
         {{else}}
           <div class="button-box">
+          {{#if isDemoUser }} {{else}}
             <button id="install-apps-button">Install apps</button>
             <button id="upload-app-button">Upload an app</button>
             <button id="restore-backup-button">Restore a backup</button>
+            {{/if }}
           </div>
         {{/if}}
         <table>
@@ -429,7 +431,7 @@ $KEY</textarea></p>
 
   <div id="demo" class="main-content">
     <div class="centered-box">
-      <h2>Sandstorm Demo</h2>
+      <h2>Out of the Office</h2>
       {{#if allowDemo}}
         {{#if isSignedUp}}
           {{#if isDemoUser}}
@@ -443,24 +445,20 @@ $KEY</textarea></p>
             <p>Logging in...</p>
           {{else}}
             <p><input id="demo-display-name" type="hidden" value="">
-               <button id="createDemoUser">Start the demo »</button></p>
+               <button id="createDemoUser">begin »</button></p>
           {{/if}}
         {{/if}}
 
-        <h3>What is this?</h3>
-        <p>Sandstorm is an open source hosting platform for personal instances of web apps. Users
-          can upload and install arbitrary software. In addition to improving privacy and control,
-          <a href="https://blog.sandstorm.io/news/2014-07-21-open-source-web-apps-require-federated-hosting.html">
-          this is the only way to make Open Source web apps viable.</a></p>
+        <p>
+          Joe Warden is worried about his daughter Helena, who has recently disappeared.
+          Through a stroke of luck, he has just gained access to Helena's computer.
+          What clues can be found in Helena's personal files?
+        </p>
+
         <p>Notes:</p>
         <ul>
-          <li>Demo accounts last one hour.</li>
-          <li>Demo accounts can only install apps from Sandstorm.io, but this
-            is an artificial limitation. Real users can upload whatever code they want, as
-            each app server runs in a secure sandbox.</li>
-          <li>We only have one machine. It may get slow or crashy under excessive load.</li>
-          <li>We know the UI design needs work. This is a tech demo. ;)</li>
-          <li><a href="http://igg.me/at/sandstorm">Read more and fund us on Indiegogo.</a></li>
+          <li>This is a game for <a href="http://ludumdare.com"> Ludum Dare</a> 30.</li>
+          <li>It is built on a hacked version of <a href="http://sandstorm.io">Sandstorm</a>. </li>
         </ul>
       {{else}}
         <p>Sorry, this server does not allow demo accounts.</p>

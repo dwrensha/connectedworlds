@@ -84,6 +84,8 @@ if (Meteor.isServer) {
         var packageIds = ["992eb56f773d67f6c56abd88b00b089e" // mailpile
                           ,"c2797db5613fed8b7dd6c77e006fc385" // supercalendar
                           ,"0af93fa1c819043c41cd0ba020fb2ef0" // sharelatex
+                          ,"4f0278fcda80492b8d23398692c7326d" // mediagoblin
+                          ,"b27f0cef42ae851ece6f6621f8d35496" // etherpad
                           ];
         for (idx in packageIds){
           var packageId = packageIds[idx];
